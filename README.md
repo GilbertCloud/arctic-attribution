@@ -2,7 +2,7 @@
 
 [![DOI](https://zenodo.org/badge/1286435231.svg)](https://zenodo.org/badge/latestdoi/1286435231)
 
-This repository contains the run scripts, namelists, and code modifications for all of the experiments in the paper "Internal and anthropogenic contributions to recent (1950-2024) Arctic temperature and sea ice change" by Ash L. Gilbert, Jennifer E. Kay, and Edward Blanchard-Wrigglesworth submitted to _Environmental Research: Climate_.
+This repository contains the run scripts, namelists, and code modifications for all of the experiments in the paper "Internal and anthropogenic contributions to recent (1950-2024) Arctic temperature and sea ice change" by Ash L. Gilbert, Jennifer E. Kay, and Edward Blanchard-Wrigglesworth, submitted to _Environmental Research: Climate_.
 
 For information about creating the ERA5 reanalysis files for wind nudging, see https://github.com/GilbertCloud/ERA5_CESM2_nudgingfiles.
 
