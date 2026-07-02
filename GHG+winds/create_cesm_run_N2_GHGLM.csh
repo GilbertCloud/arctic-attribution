@@ -23,9 +23,9 @@ set REFCASE=${COMPSET_SHORT}.e21.${COMPSET}.${RES}.PiC_UVnudge_LM2006.
 set REFDATE=2024-01-01
 set REFDIR=/glade/campaign/univ/ucub0155/glydia
 
-set PROJ=UCUB0155
+set PROJ=$PROJECT
 echo $PROJ
-set CONT_RUN=TRUE
+set CONT_RUN=FALSE
 
 ## Set path variables in this section
 set CESMDIR=/glade/work/glydia/cesm_tags/cesm2.1.5
@@ -58,12 +58,6 @@ foreach i ( 1 2 3 )
 
 		## Do XMLCHANGE options here
 
-		# CAM configure options
-		#./xmlchange --append CAM_CONFIG_OPTS='cosp'
-
-		# Debug
-		#./xmlchange INFO_DBUG=2
-
 		# Optimize run
 		cp $MODSDIR/env_mach_pes.xml .
 		cp $MODSDIR/env_build.xml .
@@ -81,9 +75,6 @@ foreach i ( 1 2 3 )
 
 		## Setup case
 		./case.setup
-
-		# Copy source mods - if any
-		#cp $MODSDIR/* $CASEDIR/SourceMods/src.cam/
 
 		# Copy restart files
 		cp $REFDIR/$REFCASENAME/rest/$REFDATE-00000/* /glade/derecho/scratch/$USER/$CASENAME/run/

@@ -5,23 +5,23 @@ All processing code requires Casper computing to run. Processing code that uses 
 
 ## Code files
 
-- Processing_functions.py: Python script containing custom processing functions
-- Proc_ERA5_surf.ipynb: Jupyter notebook for munging ERA5 surface temperature and sea ice concentration data
-- Proc_GISTEMPv4.ipynb: Jupyter notebook for munging GISTEMP temperature anomaly data
-- Proc_HadCRUT5.ipynb: Jupyter notebook for munging HadCRUT5 temperature anomaly data
-- Proc_BEST.ipynb: Jupyter notebook for munging BEST temperature anomaly data
-- Proc_NSIDC.ipynb: Jupyter notebook for munging NSIDC sea ice extent data
-- Proc_OSISAF.ipynb: Jupyter notebook for munging OSISAF sea ice extent data
-- Proc_RAPID.ipynb: Jupyter notebook for munging RAPID AMOC transport data
+- `Processing_functions.py`: Python script containing custom processing functions
+- `Proc_ERA5_surf.ipynb`: Jupyter notebook for munging ERA5 surface temperature and sea ice concentration data
+- `Proc_GISTEMPv4.ipynb`: Jupyter notebook for munging GISTEMP temperature anomaly data
+- `Proc_HadCRUT5.ipynb`: Jupyter notebook for munging HadCRUT5 temperature anomaly data
+- `Proc_BEST.ipynb`: Jupyter notebook for munging BEST temperature anomaly data
+- `Proc_NSIDC.ipynb`: Jupyter notebook for munging NSIDC sea ice extent data
+- `Proc_OSISAF.ipynb`: Jupyter notebook for munging OSISAF sea ice extent data
+- `Proc_RAPID.ipynb`: Jupyter notebook for munging RAPID AMOC transport data
 
 ### Raw single-variable timeseries to processed single-variable timeseries
-- Proc_UVnudge_ensemble.ipynb: Jupyter notebook for munging all wind nudging experiment timeseries
-- Proc_CESM2_HIST_SSP370.ipynb: Jupyter notebook for munging CESM2 Large Ensemble timeseries
-- Proc_CESM2_HIST_SSP370_GHG.ipynb: Jupyter notebook for munging CESM2 Single-Forcing Greenhouse-Gas only timeseries
-- Proc_CESM2_piControl.ipynb: Jupyter notebook for munging CESM2 pre-industrial control timeseries
+- `Proc_UVnudge_ensemble.ipynb`: Jupyter notebook for munging all wind nudging experiment timeseries
+- `Proc_CESM2_HIST_SSP370.ipynb`: Jupyter notebook for munging CESM2 Large Ensemble timeseries
+- `Proc_CESM2_HIST_SSP370_GHG.ipynb`: Jupyter notebook for munging CESM2 Single-Forcing Greenhouse-Gas only timeseries
+- `Proc_CESM2_piControl.ipynb`: Jupyter notebook for munging CESM2 pre-industrial control timeseries
 
 ### Processed single-variable timeseries to plottable data
-- Proc_PiC_HIST_UVnudge_analaysis.ipynb: Jupyter notebook for doing final munging of all wind nudging experiment data
+- `Proc_PiC_HIST_UVnudge_analaysis.ipynb`: Jupyter notebook for doing final munging of all wind nudging experiment data
 
 ## Processing code run order:
 1) Start with CUPiD generated single-variable timeseries

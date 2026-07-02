@@ -17,11 +17,11 @@ set CASETITLE=PiC_UVnudge_LM2006
 set RES=f09_g17
 set COMPSET=B1850cmip6
 set COMPSET_SHORT=b
-set STARTDATE=1950-01-01
+set STARTDATE=2024-01-01
 
-set REFDATE=2006-01-01
+set REFDATE=2024-01-01
 
-set PROJ=UCUB0155
+set PROJ=$PROJECT
 echo $PROJ
 set CONT_RUN=TRUE
 
@@ -38,7 +38,7 @@ foreach i ( 1 2 3 )
 	## Set option variables specific to ensemble member
 	# Set ensemble number case name
 	set NNN=$NNN_arr[$i]
-	set REFCASE=${COMPSET_SHORT}.e21.${COMPSET}.${RES}.PiC_UVnudge_LM.${NNN}
+	set REFCASE=${COMPSET_SHORT}.e21.${COMPSET}.${RES}.PiC_UVnudge_LM2006.${NNN}
 	set CASENAME=${COMPSET_SHORT}.e21.${COMPSET}.${RES}.${CASETITLE}.${NNN}
 	echo $CASENAME
 
@@ -56,18 +56,12 @@ foreach i ( 1 2 3 )
 
 		## Do XMLCHANGE options here
 
-		# CAM configure options
-		#./xmlchange --append CAM_CONFIG_OPTS='cosp'
-
-		# Debug
-		#./xmlchange INFO_DBUG=2
-
 		# Optimize run
 		cp $MODSDIR/env_mach_pes.xml .
 		cp $MODSDIR/env_build.xml .
 
 		# Runtime variables
-		./xmlchange STOP_OPTION="nyears",RESUBMIT=0,STOP_N=2,JOB_WALLCLOCK_TIME=11:57:00,REST_N=2,REST_OPTION="nyears",CONTINUE_RUN=$CONT_RUN
+		./xmlchange STOP_OPTION="nyears",RESUBMIT=0,STOP_N=1,JOB_WALLCLOCK_TIME=4:00:00,REST_N=1,REST_OPTION="nyears",CONTINUE_RUN=$CONT_RUN
 		./xmlquery STOP_OPTION,RESUBMIT,STOP_N,JOB_WALLCLOCK_TIME,REST_N,REST_OPTION,CONTINUE_RUN
 
 		# Any other xmlchanges...
@@ -81,9 +75,6 @@ foreach i ( 1 2 3 )
 		./case.setup
 
 		./preview_namelists
-
-		# Copy source mods - if any
-		#cp $MODSDIR/ocn_mod/* $CASEDIR/SourceMods/src.pop/
 
 		# Copy restart files
 		cp /glade/derecho/scratch/glydia/archive/$REFCASE/rest/$REFDATE-00000/* /glade/derecho/scratch/$USER/$CASENAME/run/
@@ -101,31 +92,6 @@ foreach i ( 1 2 3 )
 
 		## Submit case to queue
 		./case.submit
-	endif
-
-	## If CONTINUE_RUN is true
-	if ($CONT_RUN == TRUE) then
-		cd $CASEDIR
-
-		cp /glade/u/home/glydia/derecho_case_scripts/namelists/N1_LM/user_nl_cam .
-
-		# Do XMLCHANGE options for CONTINUE_RUN
-		./xmlquery JOB_QUEUE,JOB_WALLCLOCK_TIME
-		./xmlchange JOB_WALLCLOCK_TIME=4:00:00
-		./xmlquery JOB_QUEUE,JOB_WALLCLOCK_TIME
-
-		# Do XMLCHANGE options for CONTINUE_RUN - 72 years - adjust stop_n/rest_n/resubmit based on 
-		./xmlquery STOP_N,STOP_OPTION,RESUBMIT,REST_N,CONTINUE_RUN
-		./xmlchange STOP_N=1,STOP_OPTION="nyears",RESUBMIT=0,REST_N=1,REST_OPTION="nyears",CONTINUE_RUN=$CONT_RUN
-		./xmlquery STOP_N,STOP_OPTION,RESUBMIT,REST_N,REST_OPTION,CONTINUE_RUN
-
-		./preview_namelists
-
-		## Build case
-		qcmd -- ./case.build
-
-		./case.submit
-
 	endif
 end
 

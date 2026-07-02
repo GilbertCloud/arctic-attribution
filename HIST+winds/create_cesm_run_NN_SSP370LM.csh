@@ -23,9 +23,9 @@ set REFCASE=${COMPSET_SHORT}.e21.BHISTsmbb.${RES}.HIST_UVnudge_LM.
 set REFDATE=2015-01-01
 set REFDIR=/glade/derecho/scratch/glydia/archive
 
-set PROJ=UCUB0155
+set PROJ=$PROJECT
 echo $PROJ
-set CONT_RUN=TRUE
+set CONT_RUN=FALSE
 
 ## Set path variables in this section
 set CESMDIR=/glade/work/glydia/cesm_tags/cesm2.1.5
@@ -57,12 +57,6 @@ foreach i ( 1 2 3 )
 
 		## Do XMLCHANGE options here
 
-		# CAM configure options
-		#./xmlchange --append CAM_CONFIG_OPTS='cosp'
-
-		# Debug
-		#./xmlchange INFO_DBUG=2
-
 		# Optimize run
 		cp $MODSDIR/env_mach_pes.xml .
 		cp $MODSDIR/env_build.xml .
@@ -80,9 +74,6 @@ foreach i ( 1 2 3 )
 
 		## Setup case
 		./case.setup
-
-		# Copy source mods - if any
-		#cp $MODSDIR/* $CASEDIR/SourceMods/src.cam/
 
 		# Copy restart files
 		cp $REFDIR/$REFCASENAME/rest/$REFDATE-00000/* /glade/derecho/scratch/$USER/$CASENAME/run/
@@ -113,9 +104,9 @@ foreach i ( 1 2 3 )
 		./xmlchange JOB_WALLCLOCK_TIME=4:00:00
 		./xmlquery JOB_QUEUE,JOB_WALLCLOCK_TIME
 
-		# Do XMLCHANGE options for CONTINUE_RUN - 72 years - adjust stop_n/rest_n/resubmit based on 
+		# Do XMLCHANGE options for CONTINUE_RUN - 5 years - adjust stop_n/rest_n/resubmit based on 
 		./xmlquery STOP_N,STOP_OPTION,RESUBMIT,REST_N,CONTINUE_RUN
-		./xmlchange STOP_N=1,STOP_OPTION="nyears",RESUBMIT=0,REST_N=1,REST_OPTION="nyears",CONTINUE_RUN=$CONT_RUN
+		./xmlchange STOP_N=5,STOP_OPTION="nyears",RESUBMIT=0,REST_N=5,REST_OPTION="nyears",CONTINUE_RUN=$CONT_RUN
 		./xmlquery STOP_N,STOP_OPTION,RESUBMIT,REST_N,REST_OPTION,CONTINUE_RUN
 
 		./preview_namelists

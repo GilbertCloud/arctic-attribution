@@ -1,0 +1,55 @@
+! Users should add all user specific namelist changes below in the form of 
+! namelist_var = new_namelist_value 
+
+!!      h0,  h1, h2, h3,  h4,  h5,  h6,  h7,  h8
+nhtfrq = 0 
+mfilt  = 1
+
+!================
+! evolving GHG
+!================
+&chem_surfvals_nl
+ flbc_file              = '/glade/p/cesmdata/cseg/inputdata/atm/waccm/lb/LBC_2014-2500_CMIP6_SSP370_0p5degLat_GlobAnnAvg_c190301.nc'
+ flbc_list              = 'CO2','CH4','N2O','CFC11eq','CFC12'
+ flbc_type              = 'SERIAL'
+ scenario_ghg           = 'CHEM_LBC_FILE'
+/
+
+history_dust                   = .true. 
+do_circulation_diags           = .true. 
+
+&nudging_nl
+ model_times_per_day            = 48
+ nudge_beg_day          = 01
+ nudge_beg_month                = 01
+ nudge_beg_year         = 2015
+ nudge_end_day          = 31
+ nudge_end_month                = 12
+ nudge_end_year         = 2024
+ nudge_file_template            = '%y%m/ERA5.6hour.32level.uvtq.%y-%m-%d-%s.nc'
+ nudge_force_opt                = 1
+ nudge_hwin_lat0                = 75.0
+ nudge_hwin_latdelta            = 1.0
+ nudge_hwin_latwidth            = 30.0
+ nudge_hwin_lon0                = 180.
+ nudge_hwin_londelta            = 1.0
+ nudge_hwin_lonwidth            = 999.
+ nudge_model            = .true.
+ nudge_path             = '/glade/campaign/univ/ucub0155/glydia/ERA5_CESM2_nudging/'
+ nudge_pscoef           = 0.00
+ nudge_psprof           = 0
+ nudge_qcoef            = 0.00
+ nudge_qprof            = 0
+ nudge_tcoef            = 0.00
+ nudge_times_per_day            = 4
+ nudge_timescale_opt            = 1
+ nudge_tprof            = 0
+ nudge_ucoef            = 1.0
+ nudge_uprof            = 2
+ nudge_vcoef            = 1.0
+ nudge_vprof            = 2
+ nudge_vwin_hdelta              = 0.1
+ nudge_vwin_hindex              = 25.
+ nudge_vwin_ldelta              = 0.1
+ nudge_vwin_lindex              = 0.
+/
