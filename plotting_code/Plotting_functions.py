@@ -12,104 +12,93 @@ from matplotlib.colors import Colormap, BoundaryNorm, ListedColormap
 from matplotlib.colorbar import Colorbar
 from matplotlib.axes import Axes
 
-## Functions for plotting secondary axis with wavenumber/wavelength
-def wvn2wvl(x):
-    return 10000/x
-
-def wvl2wvn(x):
-    return 10000/x
-
-## Functions for plotting secondary axis with height/pressure
-H = 8000 # m
-p0 = 1013.25 # hPa
-def p2z(x):
-    return -1*H*np.log(x/p0)
-
-def z2p(x):
-    return p0*np.exp(-1*x/H)
-
-def t_test_two_means(m1: float|np.ndarray|xr.DataArray, m2: float|np.ndarray|xr.DataArray,
-                     std1: float|np.ndarray|xr.DataArray, std2: float|np.ndarray|xr.DataArray,
-                     n1: float|np.ndarray|xr.DataArray, n2: float|np.ndarray|xr.DataArray,
-                     test_type: int|float, diff: float|np.ndarray|xr.DataArray) -> np.ndarray:
-    '''
-    This function calculates the p-values for a small sample test for the difference between two means. 
-    Assumes null hypothesis can be:
-    • µ1 - µ2 ≤ ∆
-    • µ1 - µ2 ≥ ∆
-    • µ1 - µ2 = ∆
-
-    INPUT:
-    m1: sample 1 mean(s) 
-    m2: sample 2 mean(s)
-    std1: sample 1 standard deviation(s)
-    std2: sample 2 standard deviation(s)
-    n1: sample 1 size(s)
-    n2: sample 2 size(s)
-    test_type: whether the test is one (1) or two tailed (2)
-    diff: diff between population means (∆)
-
-    OUTPUT:
-    pvalue: p values
-    '''
-
-    if (test_type != 1) and (test_type != 2):
-        raise ValueError('\'test_type\' value  must be 1 or 2')
-
-    # Calculate t-statistic
-    tstat = (m1-m2-diff)/np.sqrt(((std1**2)/n1)+((std2**2)/n2))
-
-    # Calculate degrees of freedom and round down
-    df = ((((std1**2)/n1)+((std2**2)/n2))**2)/(((((std1**2)/n1)**2)/(n1-1))+((((std2**2)/n2)**2)/(n2-1)))
-    df = np.floor(df)
-
-    # Calculate & return p-value
-    pvalue = stats.t.sf(abs(tstat),df=df)*test_type
-    return pvalue
-
-def Wilks_pcrit(pvalues: np.ndarray, siglevel: float) -> float:
-    '''
-    This function calcules the p-critical level for the Wilks significance test
-
-    INPUT:
-    pvalues: array of p-values
-    siglevel: significance level (i.e. 0.01 or 1%, 0.05 or 5%, ...)
-    
-    OUTPUT:
-    pcrit: Wilks p-critical value (i.e. any p-value less than this is significant)
-    '''
-
-    # Calculate false detection rate
-    alpha_fdr = 2*siglevel
-
-    # Flatten p-values into 1D array & sort
-    pvalues_fl = pvalues.flatten()
-    pvalues_fl = np.sort(pvalues_fl)
-
-    # Generate arrays to calculate differences
-    x = np.arange(1,len(pvalues_fl)+1,1)
-    x = x.astype(float)
-    y = (x/len(x))*alpha_fdr
-
-    # Calculate differences
-    d = pvalues_fl-y
-
-    # Grab index of first p-value where p-value > y
-    w_out = np.where(d>0.0)
-    k = -1 if w_out[0].size == 0 else w_out[0][0]
-
-    # Find p-critical value & return it
-    # None of the p-values are significant
-    if k == 0:
-        pcrit = 0.0
-    # All p-values are significant
-    elif k == -1:
-        pcrit = pvalues_fl[-1]
-    # Some p-values are significant
-    else:
-        pcrit = pvalues_fl[k-1]
-        
-    return pcrit
+lats = np.array([-90, -89.0575916230366, -88.1151832460733, -87.1727748691099, 
+    -86.2303664921466, -85.2879581151832, -84.3455497382199, -83.4031413612565, 
+    -82.4607329842932, -81.5183246073298, -80.5759162303665, -79.6335078534031, 
+    -78.6910994764398, -77.7486910994764, -76.8062827225131, -75.8638743455497, 
+    -74.9214659685864, -73.979057591623, -73.0366492146597, -72.0942408376963, 
+    -71.151832460733, -70.2094240837696, -69.2670157068063, -68.3246073298429, 
+    -67.3821989528796, -66.4397905759162, -65.4973821989529, -64.5549738219895, 
+    -63.6125654450262, -62.6701570680628, -61.7277486910995, -60.7853403141361,
+    -59.8429319371728, -58.9005235602094, -57.9581151832461, -57.0157068062827, 
+    -56.0732984293194, -55.130890052356, -54.1884816753927, -53.2460732984293, 
+    -52.303664921466, -51.3612565445026, -50.4188481675393, -49.4764397905759, 
+    -48.5340314136126, -47.5916230366492, -46.6492146596859, -45.7068062827225, 
+    -44.7643979057592, -43.8219895287958, -42.8795811518325, -41.9371727748691,
+    -40.9947643979058, -40.0523560209424, -39.1099476439791, -38.1675392670157, 
+    -37.2251308900524, -36.282722513089, -35.3403141361257, -34.3979057591623, 
+    -33.455497382199, -32.5130890052356, -31.5706806282722, -30.6282722513089, 
+    -29.6858638743456, -28.7434554973822, -27.8010471204189, -26.8586387434555, 
+    -25.9162303664921, -24.9738219895288, -24.0314136125654, -23.0890052356021, 
+    -22.1465968586387, -21.2041884816754, -20.261780104712, -19.3193717277487, 
+    -18.3769633507853, -17.434554973822, -16.4921465968586, -15.5497382198953, 
+    -14.6073298429319, -13.6649214659686, -12.7225130890052, -11.7801047120419, 
+    -10.8376963350785, -9.89528795811519, -8.95287958115183, -8.01047120418848, 
+    -7.06806282722513, -6.12565445026178, -5.18324607329843, -4.24083769633508, 
+    -3.29842931937173, -2.35602094240838, -1.41361256544502, -0.471204188481678, 
+    0.471204188481678, 1.41361256544502, 2.35602094240838, 3.29842931937172, 
+    4.24083769633508, 5.18324607329843, 6.12565445026178, 7.06806282722513, 
+    8.01047120418848, 8.95287958115183, 9.89528795811518, 10.8376963350785, 
+    11.7801047120419, 12.7225130890052, 13.6649214659686, 14.6073298429319, 
+    15.5497382198953, 16.4921465968586, 17.434554973822, 18.3769633507853, 
+    19.3193717277487, 20.261780104712, 21.2041884816754, 22.1465968586387, 
+    23.0890052356021, 24.0314136125654, 24.9738219895288, 25.9162303664921, 
+    26.8586387434555, 27.8010471204188, 28.7434554973822, 29.6858638743455, 
+    30.6282722513089, 31.5706806282723, 32.5130890052356, 33.455497382199, 
+    34.3979057591623, 35.3403141361257, 36.282722513089, 37.2251308900524, 
+    38.1675392670157, 39.1099476439791, 40.0523560209424, 40.9947643979058, 
+    41.9371727748691, 42.8795811518325, 43.8219895287958, 44.7643979057592, 
+    45.7068062827225, 46.6492146596859, 47.5916230366492, 48.5340314136126, 
+    49.4764397905759,50.4188481675393, 51.3612565445026, 52.303664921466, 
+    53.2460732984293, 54.1884816753927, 55.130890052356, 56.0732984293194, 
+    57.0157068062827, 57.9581151832461, 58.9005235602094, 59.8429319371728, 
+    60.7853403141361, 61.7277486910995, 62.6701570680628, 63.6125654450262, 
+    64.5549738219895, 65.4973821989529, 66.4397905759162, 67.3821989528796, 
+    68.3246073298429, 69.2670157068063, 70.2094240837696, 71.151832460733, 
+    72.0942408376963, 73.0366492146597, 73.979057591623, 74.9214659685864, 
+    75.8638743455497, 76.8062827225131, 77.7486910994764, 78.6910994764398, 
+    79.6335078534031, 80.5759162303665, 81.5183246073298, 82.4607329842932, 
+    83.4031413612565, 84.3455497382199, 85.2879581151832, 86.2303664921466, 
+    87.17277486911, 88.1151832460733, 89.0575916230366, 90])
+arclats = np.array([50.4188481675393, 51.3612565445026, 52.303664921466, 
+        53.2460732984293, 54.1884816753927, 55.130890052356, 56.0732984293194, 
+        57.0157068062827, 57.9581151832461, 58.9005235602094, 59.8429319371728, 
+        60.7853403141361, 61.7277486910995, 62.6701570680628, 63.6125654450262, 
+        64.5549738219895, 65.4973821989529, 66.4397905759162, 67.3821989528796, 
+        68.3246073298429, 69.2670157068063, 70.2094240837696, 71.151832460733, 
+        72.0942408376963, 73.0366492146597, 73.979057591623, 74.9214659685864, 
+        75.8638743455497, 76.8062827225131, 77.7486910994764, 78.6910994764398, 
+        79.6335078534031, 80.5759162303665, 81.5183246073298, 82.4607329842932, 
+        83.4031413612565, 84.3455497382199, 85.2879581151832, 86.2303664921466, 
+        87.17277486911, 88.1151832460733, 89.0575916230366, 90])
+lons = np.array([-180, -178.75, -177.5, -176.25, -175, -173.75, -172.5, -171.25, -170, 
+    -168.75, -167.5, -166.25, -165, -163.75, -162.5, -161.25, -160, -158.75, 
+    -157.5, -156.25, -155, -153.75, -152.5, -151.25, -150, -148.75, -147.5, 
+    -146.25, -145, -143.75, -142.5, -141.25, -140, -138.75, -137.5, -136.25, 
+    -135, -133.75, -132.5, -131.25, -130, -128.75, -127.5, -126.25, -125, 
+    -123.75, -122.5, -121.25, -120, -118.75, -117.5, -116.25, -115, -113.75, 
+    -112.5, -111.25, -110, -108.75, -107.5, -106.25, -105, -103.75, -102.5, 
+    -101.25, -100, -98.75, -97.5, -96.25, -95, -93.75, -92.5, -91.25, -90, 
+    -88.75, -87.5, -86.25, -85, -83.75, -82.5, -81.25, -80, -78.75, -77.5, 
+    -76.25, -75, -73.75, -72.5, -71.25, -70, -68.75, -67.5, -66.25, -65, 
+    -63.75, -62.5, -61.25, -60, -58.75, -57.5, -56.25, -55, -53.75, -52.5, 
+    -51.25, -50, -48.75, -47.5, -46.25, -45, -43.75, -42.5, -41.25, -40, 
+    -38.75, -37.5, -36.25, -35, -33.75, -32.5, -31.25, -30, -28.75, -27.5, 
+    -26.25, -25, -23.75, -22.5, -21.25, -20, -18.75, -17.5, -16.25, -15, 
+    -13.75, -12.5, -11.25, -10, -8.75, -7.5, -6.25, -5, -3.75, -2.5, -1.25, 
+    0, 1.25, 2.5, 3.75, 5, 6.25, 7.5, 8.75, 10, 11.25, 12.5, 13.75, 15, 
+    16.25, 17.5, 18.75, 20, 21.25, 22.5, 23.75, 25, 26.25, 27.5, 28.75, 30, 
+    31.25, 32.5, 33.75, 35, 36.25, 37.5, 38.75, 40, 41.25, 42.5, 43.75, 45, 
+    46.25, 47.5, 48.75, 50, 51.25, 52.5, 53.75, 55, 56.25, 57.5, 58.75, 60, 
+    61.25, 62.5, 63.75, 65, 66.25, 67.5, 68.75, 70, 71.25, 72.5, 73.75, 75, 
+    76.25, 77.5, 78.75, 80, 81.25, 82.5, 83.75, 85, 86.25, 87.5, 88.75, 90, 
+    91.25, 92.5, 93.75, 95, 96.25, 97.5, 98.75, 100, 101.25, 102.5, 103.75, 
+    105, 106.25, 107.5, 108.75, 110, 111.25, 112.5, 113.75, 115, 116.25, 
+    117.5, 118.75, 120, 121.25, 122.5, 123.75, 125, 126.25, 127.5, 128.75, 
+    130, 131.25, 132.5, 133.75, 135, 136.25, 137.5, 138.75, 140, 141.25, 
+    142.5, 143.75, 145, 146.25, 147.5, 148.75, 150, 151.25, 152.5, 153.75, 
+    155, 156.25, 157.5, 158.75, 160, 161.25, 162.5, 163.75, 165, 166.25, 
+    167.5, 168.75, 170, 171.25, 172.5, 173.75, 175, 176.25, 177.5, 178.75])
 
 def CustomCmap(levels: List[float]|np.ndarray, colorlist: List|Colormap, extremes: List, list: bool=True) -> Tuple[Colormap, BoundaryNorm]:
     '''
@@ -197,80 +186,3 @@ def draw_circle(ax: Axes, grdln_x_maj: List[float]|np.ndarray=np.arange(-180,181
     else:
         return None
     
-
-# Variables for this function
-ens_dict1 = {'Mean': '', 'All_members': 'ensemble_member'}
-ens_dict2 = {'Mean': (), 'All_members': ('ensemble_member',)}
-time_dict = {0: 'month', 1: 'year', 2: 'season', 3: ''}
-
-
-def CalcStatSig(control_data_avg: xr.Dataset, control_data_std: xr.Dataset, control_data_n: xr.Dataset, 
-                optics_data_avg: xr.Dataset, optics_data_std: xr.Dataset, optics_data_n: xr.Dataset,
-                var: str, sig: str, ens_type: str, time_avg: int) -> xr.Dataset:
-    '''
-    Calculate the p-values and p-critical value (according Wilks) from a t-test between the optics and control averages.
-    This function will only do the t-test for a single variable. Assumes alpha = 0.05.
-
-    INPUT:
-    control_data_avg: variable average for the control run
-    control_data_std: variable standard deviation for the control run
-    control_data_n: variable count (n) for the control run
-    optics_data_avg: variable average for the optics run
-    optics_data_std: variable standard deviation for the optics run
-    optics_data_n: variable count (n) for the optics run
-    var: variable string
-    sig: how to evaluate the significance of p-values using 'Wilks' or 'No_Wilks'. 'No_Wilks' assumes alpha = 0.05.
-    ens_type: Whether the data variable is an ensemble mean ('Mean') or all the ensemble members ('All_members')
-    time_avg: Integer describing how the data was averaged [by season: 2, by month: 0, entire dataset: 3, by year: 1]
-
-    OUTPUT:
-    optics_data_avg: variable average for the optics run with the p-values and p-critical values added as variables
-    '''
-    # Get appropriate values from ens_dict and time_dict
-    e_dim = ens_dict1[ens_type]
-    t_dim = time_dict[time_avg]
-
-    # Set up dimensions list for p-critical values
-    pcdims = (e_dim,t_dim)
-
-    # Set up dimensions list for p-values
-    pdims = ens_dict2[ens_type]+(t_dim,'lat','lon') if time_avg != 3 else ens_dict2[ens_type]+('lat','lon')
-
-    # Set up index list based on ensemble type
-    ens_list = np.arange(1) if ens_type == 'Mean' else np.arange(control_data_avg.sizes['ensemble_member'])
-
-    # Set up index list based on time averaging
-    time_list = np.arange(1) if time_avg == 3 else np.arange(control_data_avg.sizes[t_dim])
-
-    # If variable is FLUT or FLDS do 1-sided t-test, otherwise 2-sided t-test
-    if np.logical_or(var == 'FLDS',var == 'FLUT'):
-        alt = 1
-    else:
-        alt = 2
-
-    # Calculate p-vals and load into dataset
-    pvals = t_test_two_means(optics_data_avg[var],control_data_avg[var],
-                                     optics_data_std[var],control_data_std[var],
-                                     optics_data_n[var],control_data_n[var],alt,0.)
-
-    optics_data_avg['pvals_'+var] = (pdims,pvals)
-
-    if sig == 'Wilks':
-        # Calculate Wilks p-critical
-        siglevel = 0.05
-        pcrit = np.zeros([len(ens_list),len(time_list)])
-
-        # Loop through all months/years & ensemble members
-        for i in time_list:
-            # Set time part of index
-            index = dict() if time_avg == 3 else {t_dim: i}
-            for j in ens_list:
-                # Set time/ensemble index
-                index = index.update({e_dim: j}) if ens_type == 'All_members' else index
-
-                # Calculate p-critical
-                pcrit[j,i] = Wilks_pcrit(optics_data_avg['pvals_'+var][index].values,siglevel)
-
-        optics_data_avg['pcrit_'+var] = (pcdims,pcrit)
-
-    return optics_data_avg
