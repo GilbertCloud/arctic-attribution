@@ -15,10 +15,10 @@ All processing code requires Casper computing to run. Processing code that uses 
 - `Proc_RAPID.ipynb`: Jupyter notebook for munging RAPID AMOC transport data
 
 ### Raw single-variable timeseries to processed single-variable timeseries
-- `Proc_UVnudge_ensemble.ipynb`: Jupyter notebook for munging all wind nudging experiment timeseries
-- `Proc_CESM2_HIST_SSP370.ipynb`: Jupyter notebook for munging CESM2 Large Ensemble timeseries
-- `Proc_CESM2_HIST_SSP370_GHG.ipynb`: Jupyter notebook for munging CESM2 Single-Forcing Greenhouse-Gas only timeseries
-- `Proc_CESM2_piControl.ipynb`: Jupyter notebook for munging CESM2 pre-industrial control timeseries
+- `Proc_UVnudge_ensemble.ipynb`: Jupyter notebook for munging all wind nudging experiment timeseries (PI+winds, GHG+winds, HIST+winds)
+- `Proc_CESM2_HIST_SSP370.ipynb`: Jupyter notebook for munging CESM2 Large Ensemble timeseries (HIST-SSP370-control)
+- `Proc_CESM2_HIST_SSP370_GHG.ipynb`: Jupyter notebook for munging CESM2 Single-Forcing Greenhouse-Gas only timeseries (GHG-control)
+- `Proc_CESM2_piControl.ipynb`: Jupyter notebook for munging CESM2 pre-industrial control timeseries (PI-control)
 
 ### Processed single-variable timeseries to plottable data
 - `Proc_PiC_HIST_UVnudge_analaysis.ipynb`: Jupyter notebook for doing final munging of all wind nudging experiment data
